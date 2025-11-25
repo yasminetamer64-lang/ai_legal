@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURUM • Intelligent Contract Guardian 2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/wink-nlp@2.2.0/lib/wink-nlp.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/wink-eng-lite-web-model@1.12.0/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <meta property="og:title" content="AURUM • Intelligent Contract Guardian 2025" />
+  <meta property="og:description" content="Upload your contract and let AURUM instantly detect risks, obligations, and hidden clauses with cinematic AI precision." />
+  <meta property="og:image" content="https://ibb.co/Z1fJSPFf" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://yourdomain.com/aurum.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AURUM" />
+  <style>
+    :root {
+      --gold: #f4d03f;
+      --gold-light: #f9e79f;
+      --deep-gold: #d4af37;
+      --glass: rgba(255, 255, 255, 0.78);
+      --glow: 0 0 50px rgba(244, 208, 63, 0.35);
+      --text: #2c2c2c;
+      --shadow: 0 25px 70px rgba(0,0,0,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #fdfdf9 0%, #f8f1e9 50%, #f0e6d2 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      
+    }
+    canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.7; }
+    /* Custom Cursor */
+    #cursor {
+      position: fixed;
+      width: 32px; height: 32px;
+      background: radial-gradient(circle, var(--gold) 10%, transparent 70%);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: var(--glow);
+      transition: all 0.25s ease;
+    }
+    #cursor::after {
+      content: ''; position: absolute;
+      top: 50%; left: 50%;
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #cursor.hover { transform: scale(2.2); background: rgba(244,208,63,0.15); }
+    .container {
+      max-width: 1460px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    /* Header */
+    header {
+      text-align: center;
+      padding: 9rem 0 6rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 8.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #b89778, var(--deep-gold), #fff, var(--gold), #b89778);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 6px;
+      text-shadow: 0 15px 40px rgba(212,175,55,0.25);
+    }
+    .subtitle {
+      font-size: 1.7rem;
+      color: var(--deep-gold);
+      letter-spacing: 10px;
+      font-weight: 500;
+      margin-top: 1.5rem;
+    }
+    /* BEAUTIFUL GRID LAYOUT */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3.5rem;
+      margin: 4rem 0;
+      padding: 0 2rem;
+    }
+    @media (max-width: 1200px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; padding: 0 1rem; gap: 2.5rem; } }
+    /* Full-width cards */
+    .full { grid-column: 1 / -1; }
+    .card {
+      background: var(--glass);
+      border-radius: 36px;
+      padding: 3.2rem;
+      backdrop-filter: blur(22px);
+      border: 1px solid rgba(244,208,63,0.35);
+      box-shadow: var(--shadow), var(--glow);
+      transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      width: 120px; height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    .card:hover::before { opacity: 1; }
+    .card:hover {
+      transform: translateY(-20px);
+      box-shadow: 0 50px 120px rgba(0,0,0,0.15), 0 0 100px rgba(244,208,63,0.4);
+    }
+    .upload-area {
+      border: 3px dashed var(--gold);
+      border-radius: 32px;
+      padding: 6rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(244,208,63,0.07);
+      transition: all 0.5s;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: var(--deep-gold);
+    }
+    .upload-area:hover {
+      background: rgba(244,208,63,0.18);
+      transform: scale(1.03);
+      box-shadow: 0 0 80px rgba(244,208,63,0.5);
+    }
+    textarea {
+      width: 100%;
+      height: 360px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--gold);
+      border-radius: 24px;
+      padding: 2rem;
+      font-size: 1.15rem;
+      color: #333;
+      resize: none;
+      box-shadow: inset 0 6px 25px rgba(0,0,0,0.06);
+    }
+    .btn-group {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    button {
+      background: linear-gradient(135deg, var(--deep-gold), var(--gold));
+      color: white;
+      border: none;
+      padding: 20px 70px;
+      margin: 0 15px;
+      border-radius: 70px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 18px 50px rgba(212,175,55,0.5);
+      transition: all 0.4s;
+      letter-spacing: 1.5px;
+    }
+    button:hover {
+      transform: translateY(-10px) scale(1.1);
+      box-shadow: 0 30px 70px rgba(212,175,55,0.7);
+    }
+    button.secondary {
+      background: #eee;
+      color: #555;
+    }
+    .results {
+      background: rgba(255,255,255,0.95);
+      border-radius: 36px;
+      padding: 4rem;
+      border: 2px solid var(--gold);
+      text-align: center;
+    }
+    .results h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.8rem;
+      color: var(--deep-gold);
+      margin-bottom: 3rem;
+    }
+    .risk-low { color: #27ae60; font-size: 3rem; font-weight: bold; }
+    .risk-medium { color: #e67e22; font-size: 3rem; font-weight: bold; }
+    .risk-high { color: #c0392b; font-size: 3rem; font-weight: bold; }
+    table {
+      width: 100%;
+      margin: 3rem 0;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    }
+    th {
+      background: linear-gradient(135deg, var(--deep-gold), var(--gold));
+      color: white;
+      padding: 1.8rem;
+      font-size: 1.3rem;
+    }
+    td { padding: 1.4rem; background: #fdfdfb; }
+
+    .flex {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      gap: 5rem;
+    }
+
+    img {
+      width: 800px;
+      height: 350px;
+      border-radius: 20px;
+      object-fit: cover;
+      box-shadow: var(--shadow);
+      transition: transform 0.5s;
+      
+    }
+
+    /* ====================== RESPONSIVE MAGIC – PHONES, TABLETS, LAPTOPS, 4K ====================== */
+
+@media (max-width: 1400px) {
+  .container { padding: 1.5rem; }
+  h1 { font-size: 7rem; }
+  .subtitle { font-size: 1.5rem; letter-spacing: 8px; }
+  img { width: 650px; height: 300px; }
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.8rem;
+    padding: 0 1.5rem;
+  }
+  .full { grid-column: span 2; }
+  h1 { font-size: 6rem; }
+  header { padding: 7rem 0 5rem; }
+  img { width: 100%; height: 280px; max-width: 550px; }
+  .flex { gap: 2rem; flex-wrap: wrap; justify-content: center; }
+}
+
+@media (max-width: 992px) {
+  h1 { font-size: 5.5rem; letter-spacing: 4px; }
+ .subtitle { font-size: 1.4rem; letter-spacing: 6px; }
+ .card { padding: 2.5rem; }
+ textarea { height: 320px; }
+ button { padding: 18px 50px; font-size: 1.4rem; }
+ img { height: 260px; }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 2.2rem;
+    padding: 0 1rem;
+  }
+  .full { grid-column: 1; }
+  
+  header { padding: 6rem 0 4rem; }
+  h1 { font-size: 4.8rem; }
+  .subtitle { font-size: 1.3rem; letter-spacing: 5px; }
+  
+  .card {
+    padding: 2.2rem;
+    border-radius: 28px;
+  }
+  
+  .upload-area {
+    padding: 4.5rem 1.5rem;
+    font-size: 1.5rem;
+  }
+  
+  textarea { height: 280px; font-size: 1.1rem; }
+  
+  button {
+    padding: 16px 40px;
+    font-size: 1.3rem;
+    display: block;
+    width: 100%;
+    margin: 1rem 0;
+  }
+  
+  .btn-group { padding: 1rem 0; }
+  
+  .results h2 { font-size: 3rem; }
+  .risk-low, .risk-medium, .risk-high { font-size: 2.5rem; }
+  
+  img {
+    width: 100%;
+    height: 240px;
+    border-radius: 18px;
+  }
+  
+  .flex {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 3.8rem; letter-spacing: 3px; }
+  .subtitle { font-size: 1.1rem; letter-spacing: 4px; margin-top: 1rem; }
+  
+  header { padding: 5rem 0 3rem; }
+  
+  .card {
+    padding: 1.8rem;
+    border-radius: 24px;
+  }
+  
+  .upload-area {
+    padding: 4rem 1rem;
+    font-size: 1.4rem;
+  }
+  
+  textarea {
+    height: 240px;
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .results {
+    padding: 2.5rem 1.5rem;
+  }
+  
+  .results h2 { font-size: 2.6rem; margin-bottom: 2rem; }
+  
+  table { font-size: 0.95rem; }
+  th, td { padding: 1rem; }
+  
+  canvas#riskChart { height: 300px !important; }
+  
+  img {
+    height: 200px;
+    border-radius: 16px;
+  }
+  
+  #cursor { display: none; } /* Custom cursor too distracting on mobile */
+}
+
+@media (min-width: 1600px) {
+  h1 { font-size: 10rem; }
+  .subtitle { font-size: 2rem; }
+  .card { padding: 4rem; }
+  img { width: 900px; height: 400px; }
+}
+
+@media (min-width: 2000px) {
+  .container { max-width: 1800px; }
+  h1 { font-size: 12rem; }
+  .card { padding: 5rem; border-radius: 48px; }
+  img { width: 1100px; height: 450px; }
+}
+  </style>
+</head>
+<body>
+  <div id="cursor"></div>
+  <canvas id="bg"></canvas>
+  <div class="container">
+    <header>
+      <h1>AURUM</h1>
+      <div class="subtitle">Your Trusted Legal Guardian</div>
+    </header>
+    <!-- PERFECT GRID LAYOUT -->
+    <div class="grid">
+      <!-- Upload Card (Left) -->
+    <div class="flex">   
+      <div class="card">
+        <h2 style="font-family:'Cormorant Garamond';font-size:2.6rem;color:var(--deep-gold);text-align:center;margin-bottom:1.5rem;">
+          Upload Contract
+        </h2>
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+          Drop Your Document Here<br><small style="font-size:1rem;opacity:0.8;">or click to browse (.txt)</small>
+          <input type="file" id="fileInput" accept=".txt,text/plain" style="display:none">
+        </div>
+      </div>
+        <img src="b0cff2fd-3f4f-4488-8072-4b345e885417.jpg" alt="">
+    </div>
+      <!-- Preview Card (Center - Full Width on Mobile) -->
+      <div class="card full">
+        <h2 style="font-family:'Cormorant Garamond';font-size:2.6rem;color:var(--deep-gold);margin-bottom:1.5rem;">
+          Document Preview
+        </h2>
+        <textarea id="textViewer" placeholder="Your elegant contract will appear here..."></textarea>
+      </div>
+      <!-- Action Card (Right) -->
+    <div class="flex"> 
+      <div class="card">
+        <h2 style="font-family:'Cormorant Garamond';font-size:2.6rem;color:var(--deep-gold);text-align:center;margin-bottom:2rem;">
+          Begin Review
+        </h2>
+        <div class="btn-group">
+          <button onclick="analyzeDocument()">Start Analysis</button><br><br>
+          <button class="secondary" onclick="clearAll()">Clear Document</button>
+        </div>
+      </div>
+        <img src="57276a51-73b9-4e27-ba30-f042654491c7.jpg" alt="">
+    </div> 
+      <!-- Results Card (Full Width) -->
+      <div class="card full">
+        <div id="results" class="results" style="display:none">
+          <h2>Risk Assessment Complete</h2>
+          <p><strong>Document:</strong> <span id="classResult">Commercial Agreement</span></p>
+          <p><strong>RISK LEVEL:</strong> <span id="riskLevel" class="risk-medium">MEDIUM</span></p>
+          <p><strong>Parties:</strong> <span id="entities">Analyzing...</span></p>
+          <p><strong>Obligations:</strong> <span id="obligations">0</span>  <strong>Risk Triggers:</strong> <span id="triggers">0</span></p>
+          <div id="wordTable"></div>
+          <canvas id="riskChart" height="380"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Golden floating orbs
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const orbs = [];
+    for(let i = 0; i < 60; i++) {
+      orbs.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 6 + 3,
+        speedY: Math.random() * 0.8 + 0.2,
+        opacity: Math.random() * 0.6 + 0.4
+      });
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      orbs.forEach(o => {
+        ctx.fillStyle = `rgba(244, 208, 63, ${o.opacity})`;
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = '#f4d03f';
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, o.size, 0, Math.PI*2);
+        ctx.fill();
+        o.y += o.speedY;
+        if (o.y > canvas.height + 20) o.y = -20;
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('button, .upload-area').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+    // Same smart NLP analysis (unchanged)
+    const nlp = window.winkNLP(window.winkEngLiteWebModel);
+    document.getElementById('fileInput').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => document.getElementById('textViewer').value = ev.target.result;
+        reader.readAsText(file);
+      }
+    });
+    function analyzeDocument() {
+      const text = document.getElementById('textViewer').value.toLowerCase();
+      if (!text) return alert('Please upload a document');
+      document.getElementById('results').style.display = 'block';
+      gsap.from('#results', { opacity: 0, y: 120, duration: 1.8, ease: "elastic.out(1,0.6)" });
+      const doc = nlp.readDoc(text);
+      const parties = doc.entities().out()
+        .filter(e => ['PERSON','ORGANIZATION'].includes(e.type))
+        .map(e => e.value).slice(0,8).join(', ');
+      const riskWords = ['terminate','indemnify','liable','waive','forever','irrevocable','unlimited','breach','penalty','damages'];
+      const triggers = riskWords.reduce((s,w) => s + (text.split(w).length - 1), 0);
+      const obligations = (text.match(/\b(shall|must|agrees? to|will|undertakes?)\b/gi) || []).length;
+      let risk = "LOW";
+      if (triggers > 18 || obligations > 45) risk = "HIGH";
+      else if (triggers > 7) risk = "MEDIUM";
+      document.getElementById('entities').textContent = parties || "None detected";
+      document.getElementById('obligations').textContent = obligations;
+      document.getElementById('triggers').textContent = triggers;
+      document.getElementById('riskLevel').textContent = risk;
+      document.getElementById('riskLevel').className = risk === "HIGH" ? "risk-high" : risk === "MEDIUM" ? "risk-medium" : "risk-low";
+      const words = text.match(/\b[a-z]{5,}\b/g) || [];
+      const freq = {}; words.forEach(w => freq[w] = (freq[w] || 0) + 1);
+      const top = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 14);
+      let table = '<table><tr><th>Key Term</th><th>Count</th><th>Status</th></tr>';
+      top.forEach(([w,c]) => {
+        const status = riskWords.includes(w) ? 'High Risk' : 'Standard';
+        table += `<tr><td>${w}</td><td>${c}</td><td style="color:${status==='High Risk'?'#c0392b':'#27ae60'}"><strong>${status}</strong></td></tr>`;
+      });
+      table += '</table>';
+      document.getElementById('wordTable').innerHTML = table;
+      new Chart(document.getElementById('riskChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Obligations', 'Risk Triggers', 'Neutral', 'Protective'],
+          datasets: [{ data: [obligations, triggers, obligations*0.6, 100], backgroundColor: ['#f4d03f', '#e74c3c', '#95a5a6', '#27ae60'] }]
+        },
+        options: { responsive: true, plugins: { legend: { labels: { color: '#333', font: { size: 16 } } } } }
+      });
+    }
+    function clearAll() {
+      document.getElementById('textViewer').value = '';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('fileInput').value = '';
+    }
+    // Grand entrance
+    gsap.from("header", { y: -200, opacity: 0, duration: 2.2, ease: "elastic.out(1,0.5)" });
+    gsap.from(".card", { y: 300, opacity: 0, duration: 1.8, stagger: 0.25, ease: "power4.out" });
+
+    // === DISABLE SCROLL UNTIL ANIMATION FINISHES ===
+  document.body.style.overflow = "hidden";
+
+  // Master Timeline – 10 seconds of pure luxury
+  const tl = gsap.timeline({
+    onComplete: () => {
+      document.body.style.overflow = "auto";
+      // Start floating orbs after intro
+      draw();
+    }
+  });
+
+  // 1. Dark void → Golden horizon reveal (0–2.5s)
+  tl.set("body", { background: "#000" })
+    .to("body", {
+      background: "linear-gradient(135deg, #fdfdf9 0%, #f8f1e9 50%, #f0e6d2 100%)",
+      duration: 3,
+      ease: "power2.inOut"
+    }, 1.5);
+
+  // 2. Massive golden particle explosion from center (0–4s)
+  const particlesCanvas = document.createElement("canvas");
+  particlesCanvas.style.position = "fixed";
+  particlesCanvas.style.inset = 0;
+  particlesCanvas.style.zIndex = 9998;
+  particlesCanvas.style.pointerEvents = "none";
+  document.body.appendChild(particlesCanvas);
+
+  const pctx = particlesCanvas.getContext("2d");
+  particlesCanvas.width = window.innerWidth * devicePixelRatio;
+  particlesCanvas.height = window.innerHeight * devicePixelRatio;
+  pctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const particles = [];
+  for (let i = 0; i < 380; i++) {
+    particles.push({
+      x: innerWidth / 2,
+      y: innerHeight / 2,
+      vx: (Math.random() - 0.5) * 18,
+      vy: (Math.random() - 0.5) * 18,
+      size: Math.random() * 7 + 4,
+      life: 1
+    });
+  }
+
+  function animateParticles() {
+    pctx.clearRect(0, 0, innerWidth, innerHeight);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.25; // gravity
+      p.life -= 0.012;
+      p.size *= 0.98;
+
+      pctx.globalAlpha = p.life;
+      pctx.fillStyle = "#f4d03f";
+      pctx.shadowBlur = 60;
+      pctx.shadowColor = "#f4d03f";
+      pctx.beginPath();
+      pctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      pctx.fill();
+    });
+
+    if (particles.some(p => p.life > 0)) {
+      requestAnimationFrame(animateParticles);
+    } else {
+      particlesCanvas.remove();
+    }
+  }
+  animateParticles();
+
+  // 3. Title "AURUM" cinematic reveal with light rays (2–7s)
+  tl.from("h1", {
+    scale: 0.3,
+    y: 400,
+    rotation: 25,
+    opacity: 0,
+    duration: 3.5,
+    ease: "elastic.out(1, 0.4)"
+  }, 2.8)
+  .from(".subtitle", {
+    y: 100,
+    opacity: 0,
+    duration: 2.2,
+    duration: 2.2,
+    ease: "power3.out"
+  }, "-=2.5");
+
+  // Dramatic gold light flare across title
+  const flare = document.createElement("div");
+  flare.style.cssText = `
+    position:fixed; top:15%; left:-100%; width:300px; height:300px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    filter:blur(80px); pointer-events:none; z-index:9997; mix-blend-mode:screen;
+  `;
+  document.body.appendChild(flare);
+  gsap.to(flare, {
+    left: "120%",
+    duration: 3.8,
+    ease: "power2.inOut",
+    onComplete: () => flare.remove()
+  });
+
+  // 4. Cards enter like floating golden monoliths (5–10s)
+  tl)
+  tl.to(".card", {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    duration: 2.8,
+    stagger: {
+      from: "center",
+      amount: 1.4
+    },
+    ease: "elastic.out(1, 0.5)",
+    onStart: () => {
+      gsap.set(".card", { y: 800, opacity: 0, scale: 0.6 });
+    }
+  }, 5.5);
+
+  // 5. Final golden pulse across entire screen
+  const pulse = document.createElement("div");
+  pulse.style.cssText = `
+    position:fixed; inset:0; background:radial-gradient(circle at center, rgba(244,208,63,0.4) 0%, transparent 70%);
+    pointer-events:none; opacity:0; z-index:9996;
+  `;
+  document.body.appendChild(pulse);
+  tl.to(pulse, { opacity: 1, duration: 1.2, ease: "power2.out" }, 8.8)
+    .to(pulse, { opacity: 0, duration: 1.8, onComplete: () => pulse.remove() }, 9.4);
+
+  // === ORIGINAL BACKGROUND ORBS START AFTER INTRO ===
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const orbs = [];
+  for(let i = 0; i < 80; i++) {
+    orbs.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 7 + 4,
+      speedY: Math.random() * 0.6 + 0.2,
+      opacity: Math.random() * 0.5 + 0.3
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    orbs.forEach(o => {
+      ctx.fillStyle = `rgba(244, 208, 63, ${o.opacity})`;
+      ctx.shadowBlur = 50;
+      ctx.shadowColor = '#f4d03f';
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, o.size, 0, Math.PI*2);
+      ctx.fill();
+      o.y += o.speedY;
+      if (o.y > canvas.height + 30) o.y = -30;
+      o.x += Math.sin(o.y * 0.01) * 0.8; // gentle wave
+    });
+    requestAnimationFrame(draw);
+  }
+  // draw() is called only after tl completes (see onComplete above)
+
+  // === REST OF YOUR ORIGINAL CODE (cursor, file upload, NLP, etc.) ===
+  // ... keep everything below unchanged ...
+
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('button, .upload-area, .card').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // File upload & NLP analysis (unchanged)
+  const nlp = window.winkNLP(window.winkEngLiteWebModel);
+  document.getElementById('fileInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = ev => document.getElementById('textViewer').value = ev.target.result;
+      reader.readAsText(file);
+    }
+  });
+
+  // ... rest of analyzeDocument(), clearAll() exactly as you had ...
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particlesCanvas.width = window.innerWidth * devicePixelRatio;
+    particlesCanvas.height = window.innerHeight * devicePixelRatio;
+    pctx.scale(devicePixelRatio, devicePixelRatio);
+  });
+  </script>
+</body>
+</html> 
